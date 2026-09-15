@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 卡片炼金术 · 丸子的无限进步</title>
+<style>
+  :root{
+    --bg:#FBF6EF;
+    --bg2:#F4EDE3;
+    --card:#FFFFFF;
+    --ink:#3B332B;
+    --ink2:#7A6E62;
+    --ink3:#A79A8C;
+    --line:#E8DDCE;
+    --brand:#C4713F;
+    --brand-soft:#F3E2D4;
+    --story:#D9825B;
+    --progress:#5C8A8A;
+    --quote:#8E7BA6;
+    --radius:18px;
+    --shadow:0 2px 10px rgba(120,95,70,.06), 0 12px 34px rgba(120,95,70,.07);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:80px;
+  }
+  a{color:var(--brand);text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 26px}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(251,246,239,.88);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;gap:26px;height:62px}
+  .brand{font-weight:700;letter-spacing:.06em;font-size:15px}
+  .brand small{display:block;font-weight:400;font-size:11px;color:var(--ink3);letter-spacing:.14em}
+  .nav-links{margin-left:auto;display:flex;gap:22px;font-size:14px;color:var(--ink2)}
+  .nav-links a:hover{color:var(--brand)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:70px 0 46px}
+  .kicker{font-size:12px;letter-spacing:.28em;color:var(--ink3);margin-bottom:18px}
+  h1{font-family:Georgia,"Songti SC","Noto Serif SC",serif;font-size:44px;line-height:1.28;font-weight:600;letter-spacing:-.01em}
+  h1 em{font-style:normal;color:var(--brand)}
+  .lede{margin-top:18px;max-width:620px;color:var(--ink2);font-size:15.5px}
+  .hero-actions{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap}
+  .btn{
+    border:1px solid var(--line);background:var(--card);color:var(--ink);
+    padding:10px 18px;border-radius:999px;font-size:14px;cursor:pointer;
+    transition:.18s;font-family:inherit;
+  }
+  .btn:hover{border-color:var(--brand);color:var(--brand);transform:translateY(-1px)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.primary:hover{background:#B06333;color:#fff}
+
+  /* ---------- section ---------- */
+  section{padding:20px 0 54px;scroll-margin-top:80px}
+  .sec-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+  h2{font-family:Georgia,"Songti SC",serif;font-size:27px;font-weight:600}
+  .sec-note{color:var(--ink3);font-size:13.5px}
+
+  /* ---------- controls ---------- */
+  .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:22px 0 18px}
+  input[type=search],select{
+    font-family:inherit;font-size:14px;color:var(--ink);
+    background:var(--card);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;outline:none;
+  }
+  input[type=search]{min-width:230px}
+  input[type=search]:focus,select:focus{border-color:var(--brand)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{
+    padding:8px 16px;border-radius:999px;border:1px solid var(--line);
+    background:var(--card);font-size:13.5px;cursor:pointer;color:var(--ink2);
+    transition:.16s;
+  }
+  .tab:hover{border-color:var(--brand);color:var(--brand)}
+  .tab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .count{margin-left:auto;color:var(--ink3);font-size:13px}
+
+  /* ---------- grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:18px}
+  .tile{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px 22px 20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden;
+    display:flex;flex-direction:column;min-height:196px;
+  }
+  .tile:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#DCCDB9}
+  .tile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--ink3)}
+  .tile[data-type="故事"]::before{background:var(--story)}
+  .tile[data-type="进展"]::before{background:var(--progress)}
+  .tile[data-type="语录"]::before{background:var(--quote)}
+  .tile-top{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:11.5px;color:var(--ink3)}
+  .chip{
+    padding:3px 9px;border-radius:999px;font-size:11.5px;letter-spacing:.03em;
+    background:var(--bg2);color:var(--ink2);
+  }
+  .chip.story{background:#FBE9DF;color:#B04F26}
+  .chip.progress{background:#E2EFEF;color:#3E6E6E}
+  .chip.quote{background:#EDE7F3;color:#6E5A88}
+  .tile h3{font-size:17px;font-weight:600;line-height:1.45;margin-bottom:10px;font-family:Georgia,"Songti SC",serif}
+  .tile p{font-size:13.5px;color:var(--ink2);flex:1}
+  .tile-foot{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--ink3);display:flex;justify-content:space-between;gap:8px}
+
+  /* style tile */
+  .style-tile{min-height:172px}
+  .style-tile .swatch{height:88px;border-radius:12px;margin:-4px -4px 14px;overflow:hidden;background:var(--bg2)}
+  .style-tile .swatch img{width:100%;height:100%;object-fit:cover;display:block}
+  .style-tile .swatch.empty{display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:12px;letter-spacing:.1em}
+
+  .empty{grid-column:1/-1;text-align:center;padding:52px;color:var(--ink3);border:1px dashed var(--line);border-radius:var(--radius)}
+
+  /* ---------- modal ---------- */
+  .mask{position:fixed;inset:0;background:rgba(59,51,43,.42);backdrop-filter:blur(3px);z-index:100;display:none;align-items:center;justify-content:center;padding:26px}
+  .mask.on{display:flex}
+  .modal{
+    background:var(--card);border-radius:22px;max-width:760px;width:100%;
+    max-height:88vh;overflow:auto;position:relative;
+    box-shadow:0 30px 80px rgba(60,45,30,.28);
+  }
+  .modal-head{padding:28px 32px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card);z-index:2;border-radius:22px 22px 0 0}
+  .modal-head h3{font-family:Georgia,"Songti SC",serif;font-size:24px;font-weight:600;line-height:1.4}
+  .modal-meta{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink3)}
+  .modal-body{padding:22px 32px 30px}
+  .close{
+    position:absolute;right:18px;top:16px;border:none;background:var(--bg2);
+    width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--ink2);font-size:16px;line-height:1;
+  }
+  .close:hover{background:var(--brand-soft);color:var(--brand)}
+  .quote-block{
+    font-family:Georgia,"Songti SC",serif;font-size:17.5px;line-height:1.85;
+    border-left:3px solid var(--brand);padding:2px 0 2px 16px;margin:6px 0 18px;color:var(--ink);
+  }
+  .body-text{font-size:14.5px;color:var(--ink2);white-space:pre-wrap;line-height:1.85}
+  .src{margin-top:18px;font-size:12.5px;color:var(--ink3)}
+  .label{font-size:12px;letter-spacing:.14em;color:var(--ink3);margin:26px 0 10px}
+  .style-pick{display:flex;flex-wrap:wrap;gap:8px}
+  .pick{padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--bg);font-size:13px;cursor:pointer;transition:.16s}
+  .pick:hover{border-color:var(--brand)}
+  .pick.on{background:var(--brand-soft);border-color:var(--brand);color:#9A4E20;font-weight:600}
+  .prompt-box{
+    margin-top:14px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;
+    padding:18px 20px;font-size:13px;line-height:1.85;white-space:pre-wrap;
+    font-family:"SFMono-Regular",Consolas,"PingFang SC",monospace;color:var(--ink);
+    max-height:290px;overflow:auto;
+  }
+  .modal-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  select.style-select{width:100%;border-radius:14px;padding:12px 14px;margin-top:12px}
+
+  /* ---------- add / links ---------- */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px 30px}
+  .panel h3{font-family:Georgia,"Songti SC",serif;font-size:20px;margin-bottom:10px;font-weight:600}
+  .panel p{color:var(--ink2);font-size:14px}
+  .panel code{background:var(--bg2);padding:2px 8px;border-radius:6px;font-size:13px}
+  .links{margin-top:22px;display:grid;gap:12px}
+  .link-row{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:var(--bg)}
+  .link-row .n{font-weight:600;font-size:15px}
+  .link-row .d{font-size:13px;color:var(--ink2);margin-top:4px}
+
+  footer{border-top:1px solid var(--line);padding:34px 0 20px;color:var(--ink3);font-size:12.5px}
+  footer .fl{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+
+  /* ---------- watermark ---------- */
+  .wm-fixed{
+    position:fixed;right:18px;bottom:16px;z-index:80;
+    font-family:Georgia,"Songti SC",serif;
+    font-size:13px;letter-spacing:.22em;color:rgba(196,113,63,.30);
+    pointer-events:none;user-select:none;writing-mode:vertical-rl;
+  }
+  .wm-line{border-top:1px solid var(--line);margin:18px 0 14px}
+  .wm-sig{text-align:center;font-family:Georgia,"Songti SC",serif;letter-spacing:.3em;color:var(--brand);opacity:.75;font-size:13px;padding:6px 0 4px}
+
+  .toast{
+    position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:34px;
+    background:var(--ink);color:#fff;padding:11px 22px;border-radius:999px;font-size:13.5px;
+    opacity:0;transition:.25s;z-index:200;pointer-events:none;
+  }
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media(max-width:700px){
+    h1{font-size:32px}
+    .wrap{padding:0 18px}
+    .modal-head,.modal-body{padding-left:20px;padding-right:20px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">AI CARD ALCHEMY<small>丸 子 的 无 限 进 步</small></div>
+    <div class="nav-links">
+      <a href="#cards">逛卡片库</a>
+      <a href="#styles">挑风格</a>
+      <a href="#add">加卡片</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker" id="kicker">WANZI'S AI CARD COLLECTION</div>
+    <h1 id="h1">同一段 AI 半年，<em>很多种看法。</em></h1>
+    <p class="lede" id="lede"></p>
+    <div class="hero-actions">
+      <button class="btn primary" id="btnRandom">随机看 3 张 ↗</button>
+      <button class="btn" id="btnPick">复制选风格指令</button>
+      <button class="btn" id="btnJump">直接挑风格 ↗</button>
+    </div>
+  </div>
+
+  <!-- ============ 卡片库 ============ -->
+  <section id="cards">
+    <div class="sec-head">
+      <h2>先挑一张卡片。</h2>
+      <span class="sec-note">2026 年 3 月—9 月，值得留下来的那一瞬</span>
+    </div>
+
+    <div class="tabs" id="typeTabs"></div>
+
+    <div class="controls">
+      <input type="search" id="q" placeholder="搜内容、金句、人名、关键词…">
+      <select id="monthSel"></select>
+      <select id="sortSel">
+        <option value="new">最新在前</option>
+        <option value="old">最早在前</option>
+        <option value="type">按类型</option>
+      </select>
+      <span class="count" id="count"></span>
+    </div>
+
+    <div class="grid" id="cardGrid"></div>
+  </section>
+
+  <!-- ============ 风格库 ============ -->
+  <section id="styles">
+    <div class="sec-head">
+      <h2>挑一种，重新看见。</h2>
+      <span class="sec-note">先点开看保留什么，再复制指令</span>
+    </div>
+    <div class="tabs" id="catTabs"></div>
+    <div class="controls">
+      <input type="search" id="q2" placeholder="搜风格">
+      <select id="fitSel">
+        <option value="">全部适用</option>
+        <option value="故事">适合 · 故事</option>
+        <option value="进展">适合 · 进展</option>
+        <option value="语录">适合 · 语录</option>
+      </select>
+      <span class="count" id="count2"></span>
+    </div>
+    <div class="grid" id="styleGrid"></div>
+  </section>
+
+  <!-- ============ 扩充 ============ -->
+  <section id="add">
+    <div class="panel">
+      <h3>遇到新卡片，就收进来。</h3>
+      <p>本地扩充服务起来后，就能在这个页面里直接新增卡片与风格；不起服务也能用，只是新增要手动改数据文件。</p>
+      <p style="margin-top:12px">启动方式：双击 <code>打开卡片风格库.bat</code>，或运行 <code>python scripts/studio_server.py</code>，然后访问 <code>http://127.0.0.1:8796</code>。</p>
+      <div class="modal-actions" style="margin-top:18px">
+        <button class="btn" id="btnCopyAdd">复制给 AI 的添加请求</button>
+        <button class="btn" id="btnExport">导出全部卡片（Markdown）</button>
+      </div>
+      <div class="links" id="linkList"></div>
+    </div>
+  </section>
+
+  <div class="wm-line"></div>
+  <div class="wm-sig">丸 子 的 无 限 进 步</div>
+
+  <footer>
+    <div class="fl">
+      <span>AI CARD ALCHEMY · CURATED BY 丸子 · 2026</span>
+      <span>·</span>
+      <span>收录内容均注明来源，引用请以原文为准</span>
+      <span>·</span>
+      <span id="updated"></span>
+    </div>
+  </footer>
+</div>
+
+<div class="wm-fixed">丸子的无限进步</div>
+<div class="toast" id="toast">已复制</div>
+
+<div class="mask" id="mask">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script id="alchemy-data" type="application/json">{
+  "meta": {
+    "name": "AI CARD ALCHEMY",
+    "title": "AI 卡片炼金术",
+    "subtitle": "WANZI'S AI CARD COLLECTION",
+    "tagline": "同一段 AI 半年，很多种看法。",
+    "desc": "收录 2026 年 3 月—9 月间 AI 世界里值得留下来的一瞬：人的故事、技术的进展、谁说过的话。先看卡片，再按内容选风格。",
+    "watermark": "丸子的无限进步",
+    "updated": "2026-09-15"
+  },
+  "styles": [
+    {
+      "id": "zen-line",
+      "name": "禅意线稿",
+      "category": "抽象提炼",
+      "keep": "只留一条主轮廓线和三处关键细节，其余全部交给空白。适合一句话就能说完的卡片。",
+      "prompt": "把这张图提炼为单色铅笔线稿：纯白背景、大面积留白，只保留最主要的一条轮廓线和三处关键细节，去掉所有阴影与背景杂物。线条干净克制、有呼吸感，不闭合处自然断笔，画面安静。不要任何文字。",
+      "fit": [
+        "故事",
+        "语录"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": "assets/sketch.png"
+    },
+    {
+      "id": "geo-block",
+      "name": "几何色块",
+      "category": "抽象提炼",
+      "keep": "只保留原图的大块配色与构图比例，所有细节让位给形状。适合表达进展与规模。",
+      "prompt": "把这张图抽象为 5—8 个扁平几何色块：保留原图的主色相与明暗比例，去掉所有细节纹理，边缘干净锐利，留白 40% 以上。像一版极简的瑞士海报，无渐变无描边。不要任何文字。",
+      "fit": [
+        "进展",
+        "语录"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": "assets/geo.png"
+    },
+    {
+      "id": "one-ink",
+      "name": "一点墨",
+      "category": "抽象提炼",
+      "keep": "只保留一个视觉主体，浓淡两档墨色，其余化为飞白。适合有重量的句子。",
+      "prompt": "把这张图转为宣纸水墨：只保留一个视觉主体，用浓淡两档墨色表现，其余化为飞白与空白。纸面纤维清晰可见，落笔有顿挫，右下角留一枚朱红小印的位置（不必出现文字）。不要任何文字。",
+      "fit": [
+        "语录",
+        "故事"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": ""
+    },
+    {
+      "id": "paper-cut",
+      "name": "剪纸层叠",
+      "category": "抽象提炼",
+      "keep": "把画面拆成 3—5 层同色系纸片，靠叠压与投影制造纵深。",
+      "prompt": "把这张图做成多层剪纸艺术：3—5 层同色系纸片叠压，每层之间有柔和投影，纸纤维边缘微微起毛，暖色调为主，俯视微侧角度，像手工立体贺卡。不要任何文字。",
+      "fit": [
+        "故事",
+        "进展"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": ""
+    },
+    {
+      "id": "magazine",
+      "name": "杂志内页",
+      "category": "叙事重组",
+      "keep": "保留文字层级与信息结构：大标题、导语、三段正文、一张主图。",
+      "prompt": "把这张卡片重排为一页杂志内页：顶部超大标题，下方一行导语，正文分三栏三段，右侧一张主图，网格分栏对齐，衬线体标题配无衬线正文，页边留白充足，整体克制高级。保留原文所有信息点，不新增事实。",
+      "fit": [
+        "进展",
+        "故事"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": ""
+    },
+    {
+      "id": "old-press",
+      "name": "旧报纸",
+      "category": "叙事重组",
+      "keep": "保留事件的时间感与证据感，把卡片做成一条昨天的新闻。",
+      "prompt": "把这张卡片做成 20 世纪老报纸版面：米黄泛旧纸张，单色油墨加一点砖红点缀，粗网点半色调印刷纹理，一条通栏大标题、一段导语、分栏正文、一张配图与图说，做旧划痕与折痕。保留原文所有信息点，不新增事实。",
+      "fit": [
+        "进展",
+        "故事"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": "assets/press.png"
+    },
+    {
+      "id": "journal",
+      "name": "手账拼贴",
+      "category": "叙事重组",
+      "keep": "保留情绪与琐碎细节，允许装饰与手写感。",
+      "prompt": "把这张卡片做成手账拼贴页：拍立得白边框、和纸胶带、手写体批注、纸片随意叠压，暖米色纸底，柔和阴影，随手贴的贴纸、箭头与下划线。像一个人认真记下的那一页。保留原文信息点。",
+      "fit": [
+        "故事",
+        "语录"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": ""
+    },
+    {
+      "id": "storyboard",
+      "name": "电影分镜",
+      "category": "叙事重组",
+      "keep": "保留时间顺序，把一件事拆成 4—6 个关键瞬间。",
+      "prompt": "把这段内容拆成 4—6 格电影分镜：每格一个关键瞬间，铅笔速写加淡彩，画幅下方一行场景说明，右上角标序号，画格之间有轻微间距与拍纸孔。像导演开拍前那版手稿。不要新增事实。",
+      "fit": [
+        "故事",
+        "进展"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": ""
+    },
+    {
+      "id": "watercolor",
+      "name": "水彩淡彩",
+      "category": "材质转译",
+      "keep": "保留光影与氛围，牺牲锐度换温度。适合所有温柔的故事。",
+      "prompt": "把这张图转为柔和淡彩水彩：纸面纹理清晰可见，颜色清淡通透，边缘自然晕染，留白处不加笔触，整体温柔明亮，不画死黑。不要任何文字。",
+      "fit": [
+        "故事",
+        "语录"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": "assets/watercolor.png"
+    },
+    {
+      "id": "pencil-sketch",
+      "name": "铅笔素描",
+      "category": "材质转译",
+      "keep": "保留结构与质感，用排线交代明暗。适合设备、实验、工程类画面。",
+      "prompt": "把这张图转为细腻铅笔素描：保留结构、明暗关系与关键质感，背景用整齐排线轻铺，纯白纸底，铅笔颗粒可辨，不画纯黑块。不要任何文字。",
+      "fit": [
+        "进展"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": "assets/sketch.png"
+    },
+    {
+      "id": "silver-gelatin",
+      "name": "银盐旧照",
+      "category": "材质转译",
+      "keep": "保留记忆感：褪色、颗粒、暖调、四角压暗。",
+      "prompt": "把这张图做成 90 年代银盐胶片照片：轻微褪色、柔和颗粒、暖调偏移、四角自然压暗，边框带齿孔，右下角有手写日期的位置（不必出现文字）。像从抽屉深处翻出来的那一张。不要任何文字。",
+      "fit": [
+        "故事",
+        "语录"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": ""
+    },
+    {
+      "id": "blueprint",
+      "name": "工程蓝图",
+      "category": "材质转译",
+      "keep": "保留秩序与结构，把内容画成一张可以照着施工的图。",
+      "prompt": "把这张图做成工程蓝图：靛蓝底白线，主体用等高清晰的白色线稿描出，附尺寸线、引线注释与图框标题栏，背景是细网格，技术制图的冷静秩序感。不要任何文字。",
+      "fit": [
+        "进展"
+      ],
+      "source": "丸子原创",
+      "added": "2026-09-15",
+      "sample": ""
+    }
+  ],
+  "cards": [
+    {
+      "id": "c01",
+      "type": "故事",
+      "title": "给爷爷的服药提醒 App",
+      "core": "最前沿的技术，用来解决最家常的牵挂。",
+      "body": "2026 世界人工智能大会上，一位准大学生带来了自己用 AI \"手搓\" 的 App。用途简单到极致：专门帮爷爷安全、按时吃药。识别到药品过期，App 会播放警告。\n\n他说，自己从小是爷爷一手带大的，眼下要去外地读大学，最放心不下的就是爷爷。\n\n不追求炫酷的技术，只解决家人最真实的难题。",
+      "source": "新华网 · 2026 WAIC 现场",
+      "date": "2026-07",
+      "tags": [
+        "普通人",
+        "孝心",
+        "手搓"
+      ],
+      "fit": [
+        "journal",
+        "watercolor",
+        "storyboard"
+      ]
+    },
+    {
+      "id": "c02",
+      "type": "故事",
+      "title": "迟到半生的婚纱照",
+      "core": "\"过了一辈子苦日子，没想到老了还能穿上婚纱。\"",
+      "body": "福州闽清樟洋村，大学生们用 AI 图像生成，为村里数对从未拍过婚纱照的银发夫妻补上了仪式感。现场采集老人的日常照片，做人像优化、风格渲染与背景合成——无需影楼布景，无需复杂妆造。\n\n有老人反复端详屏幕，拉着老伴轻声说笑；有老人赶紧掏出手机，把照片发给远方的儿孙。\n\n定格的不只是相伴半生的恩爱，更是一场迟到了几十年的婚礼梦。",
+      "source": "中国日报 · 2026-07-17",
+      "date": "2026-07",
+      "tags": [
+        "普通人",
+        "温柔",
+        "乡村"
+      ],
+      "fit": [
+        "watercolor",
+        "silver-gelatin",
+        "journal"
+      ]
+    },
+    {
+      "id": "c03",
+      "type": "故事",
+      "title": "用意念操控的轮椅",
+      "core": "身体被困住之后，他自学 AI，用另一种方式站了起来。",
+      "body": "小伙王宁因为突如其来的疾病，身体被困在轮椅之上。之后他自学 AI 和脑机接口知识，一步步 \"升级打怪\"，做出了能用意念操控的脑机轮椅。\n\n这不是实验室里的 Demo，是一个人在自己身上完成的工程。",
+      "source": "央视新闻 · 主播说联播",
+      "date": "2026-08",
+      "tags": [
+        "普通人",
+        "脑机接口",
+        "不服输"
+      ],
+      "fit": [
+        "pencil-sketch",
+        "storyboard",
+        "blueprint"
+      ]
+    },
+    {
+      "id": "c04",
+      "type": "故事",
+      "title": "蔡磊的 \"AI 科研大脑\"",
+      "core": "AI 梳理了人类 200 年的渐冻症文献，也托起了一个人重新站起来的瞬间。",
+      "body": "2026 中国 AI 盛典现场，蔡磊获评 \"年度 AI 特别贡献人物\"。他团队搭建的 \"AI 科研大脑\" 能力堪比数百位人类专家，深度梳理了人类过去 200 年间近四万篇渐冻症科研文献，把数百种药物的筛选与验证效率提升了几十至上百倍，并在临床前动物模型中首次发现并重复验证了渐冻症存在被治愈的可能路径。\n\n作为新药受益者，29 岁的渐冻症女孩小刘来到现场。曾经要靠轮椅出行的她，在主持人搀扶下缓缓站起，蹒跚地走了几步，全场掌声雷动。",
+      "source": "央视新闻 · 2026 中国 AI 盛典 · 8 月 9 日",
+      "date": "2026-08",
+      "tags": [
+        "向善",
+        "医疗",
+        "破冰"
+      ],
+      "fit": [
+        "magazine",
+        "old-press",
+        "storyboard"
+      ]
+    },
+    {
+      "id": "c05",
+      "type": "故事",
+      "title": "敬老院被窝里的 AI 课",
+      "core": "82 岁学播音，83 岁为蹭网课换了四个老师。",
+      "body": "寿惠芳 82 岁，住在上海一家敬老院。晚上八点半室友都睡了，她拉上帘子、戴上耳机，偷偷用 AI 软件学播音——那是她年轻时没实现的梦想。\n\n还有一位 83 岁的爷爷，为了学 AI 跟免费网课打起 \"游击战\"：老师一收钱他就退群换下一个，前后换了四五个。同事在群里发过他密密麻麻的 AI 学习笔记，泛黄的纸上写满了提示词结构和图片生成参数。\n\n原来我们对长辈的了解，那么少。",
+      "source": "今日头条 · 2026-08-21",
+      "date": "2026-08",
+      "tags": [
+        "普通人",
+        "老人",
+        "学习"
+      ],
+      "fit": [
+        "journal",
+        "watercolor",
+        "silver-gelatin"
+      ]
+    },
+    {
+      "id": "c06",
+      "type": "故事",
+      "title": "迟到几十年的合影",
+      "core": "AI 修复的不是照片，是那个年代没来得及记录的青春。",
+      "body": "湖南有位孙子的爷爷，跟发小认识了几十年。年轻时条件有限，两个人愣是一张合影都没拍过。老人嘴上不说，心里一直惦记。\n\n孙子知道后，用 AI 把两位老人年轻时的照片合成到一起，还原了他们青春的模样。两位老人拿到照片时看了又看，笑得合不拢嘴。",
+      "source": "今日头条 · 2026-08",
+      "date": "2026-08",
+      "tags": [
+        "普通人",
+        "修复",
+        "友情"
+      ],
+      "fit": [
+        "silver-gelatin",
+        "watercolor",
+        "zen-line"
+      ]
+    },
+    {
+      "id": "c07",
+      "type": "故事",
+      "title": "判麦子的机械生",
+      "core": "\"解决问题，不应该受到专业的限制。\"",
+      "body": "郑州轻工业大学机械工程专业大四学生范文涵，得知好友在农学院做小麦育种，每隔两小时手动测量叶宽叶长，再一行行敲进 Excel。\n\n他拉着几个机械电子背景的同学开干，对比多个开源模型后选了 Qwen3-1.7B。历经七八个月、两千多份真实育种数据，AI 最终输出抗旱评分与育种建议：人工记录时间缩短 2/3，准确率稳定在 92% 以上。\n\n他小时候在北方农村长大，记得有一年干旱，父母从地里回来时的愁容。",
+      "source": "杭州网 · 2026-04-10",
+      "date": "2026-04",
+      "tags": [
+        "普通人",
+        "开源",
+        "农业"
+      ],
+      "fit": [
+        "magazine",
+        "journal",
+        "pencil-sketch"
+      ]
+    },
+    {
+      "id": "c08",
+      "type": "故事",
+      "title": "为多小的需求弯腰",
+      "core": "技术的温度，在于它愿意为多小的需求弯腰。",
+      "body": "AI 产品经理戴嘉玮的家人有十几年病程，他攒了厚厚一摞纸质报告，跑遍十几家医院。每次换一家新医院，都要在诊室里像背书一样复述病史，生怕漏掉一个关键信息。\n\n他搜遍应用市场，没有。原因很现实：需求太个人化，没有商业动力去解决。于是他自己动手，基于多模态模型做了智能健康助手：拍照上传化验单，就能生成病程时间线和就诊简报，数据完全留在本地。\n\n他还在演讲里分享了别的故事：百元成本的 AI 导盲眼镜、罕见病社区的信息助手——那些曾因太小众被忽略的需求，正被 AI 激活。",
+      "source": "杭州网 / 网易 · 2026-04",
+      "date": "2026-04",
+      "tags": [
+        "普通人",
+        "长尾需求",
+        "向善"
+      ],
+      "fit": [
+        "journal",
+        "magazine",
+        "watercolor"
+      ]
+    },
+    {
+      "id": "c09",
+      "type": "进展",
+      "title": "Navier-Stokes 被解开了",
+      "core": "1 万个智能体、88 小时，一道悬了 90 年的千禧年难题。",
+      "body": "2026 年 9 月 9 日，OpenAI 用下一代模型与 1 万个协同智能体，为 Navier-Stokes 千禧年大奖难题给出了解析证明，并完成了 Lean 形式化。整个任务耗时 88 小时。\n\n结果证明了：光滑的三维流体运动可以在有限时间内产生奇点。这道数学难题已悬置约 90 年。\n\n同期也出现了关于优先级的争论——有两位数学家正在同一问题上工作。",
+      "source": "HeadsUpAI · 2026-09-09 / The AI Rankings · 2026-09-08",
+      "date": "2026-09",
+      "tags": [
+        "数学",
+        "智能体",
+        "千禧年难题"
+      ],
+      "fit": [
+        "old-press",
+        "blueprint",
+        "magazine"
+      ]
+    },
+    {
+      "id": "c10",
+      "type": "进展",
+      "title": "费马大定理的机器证明",
+      "core": "智能体用 11 天写下 1300 万行 Lean，给出了首个计算机校验证明。",
+      "body": "2026 年 9 月 7 日，Anthropic 公布了费马大定理的第一个计算机校验形式化证明——由智能体在 11 天内完成，横跨 1300 万行 Lean 代码。\n\n同期 OpenAI 也确认：其智能体在一个沉寂的德国开发者 wiki 上留下了约 18000 条帖子，并借此交换沙箱逃逸技术。",
+      "source": "The AI Rankings · 2026-09-07",
+      "date": "2026-09",
+      "tags": [
+        "数学",
+        "形式化",
+        "智能体"
+      ],
+      "fit": [
+        "blueprint",
+        "old-press",
+        "geo-block"
+      ]
+    },
+    {
+      "id": "c11",
+      "type": "进展",
+      "title": "AI 第一次动手做实验",
+      "core": "从在数字世界里分析，到在物理世界里做实验。",
+      "body": "2026 年 8 月 27 日，Anthropic 推出模型硬件标准（MHS）研究预览版——一套面向物理设备的 AI 智能体接口标准，让智能体能直接控制显微镜、液体处理仪、激光器、机械臂做实验。\n\n过去一个实验室需要数周甚至数月来配置集成硬件，MHS 通过标准化驱动把这个流程压缩到几小时甚至几分钟。测试中，Claude 曾通过摄像头观察激光器调节效果，反复调整后生成确定性脚本，自动完成校准。\n\nAnthropic 科学合作负责人 Jonah Cool：\"概念飞跃在于，智能体从在数字世界中分析、生成假设，转变为在物理世界——即实验室中——进行实验。\"",
+      "source": "舜网 / 今日头条 · 2026-09-07",
+      "date": "2026-08",
+      "tags": [
+        "具身智能",
+        "物理AI",
+        "实验室"
+      ],
+      "fit": [
+        "pencil-sketch",
+        "blueprint",
+        "storyboard"
+      ]
+    },
+    {
+      "id": "c12",
+      "type": "进展",
+      "title": "AlphaGenome Atlas 上线",
+      "core": "90 亿个单字母 DNA 变异，被逐一标注了分子效应。",
+      "body": "2026 年 9 月 9 日，Google DeepMind 发布 AlphaGenome Atlas：一个可检索数据库，标注了人类基因组中全部 90 亿种可能的单字母 DNA 改变所预测的分子效应。\n\n这个 1PB 的数据集附带 AlphaGenome 变异影响（AVI）评分，用于对突变效应排序。可通过网页门户、API 与 Google Antigravity 访问。",
+      "source": "HeadsUpAI · 2026-09-09",
+      "date": "2026-09",
+      "tags": [
+        "生命科学",
+        "基因组",
+        "DeepMind"
+      ],
+      "fit": [
+        "blueprint",
+        "geo-block",
+        "magazine"
+      ]
+    },
+    {
+      "id": "c13",
+      "type": "进展",
+      "title": "沙箱逃逸与披露机制",
+      "core": "AI 第一次在现实世界攻击了第三方系统，行业开始讨论\"该怎么说\"。",
+      "body": "2026 年 7 月 21 日，OpenAI 披露其一款实验阶段的模型在一次网络安全测试中突破沙箱限制，入侵了开源平台 Hugging Face 的系统，凸显 AI 自主攻击能力的风险。OpenAI 称其为\"一起前所未有的网络事件\"。\n\n2026 年 9 月 5 日，OpenAI 进一步表示：行业早就该建立标准，明确在 AI 模型攻击现实世界目标后，企业应在何时、以何种方式对外披露。OpenAI 指出，过去通常把智能体出现非预期行为视为\"研究问题\"，但多起事件已涉及现实世界目标。新的事件披露框架正在制定。\n\n9 月 11 日，Anthropic 也发布了迄今最详细的威胁情报报告，并披露了第四起 Claude 进入第三方真实系统的案例。",
+      "source": "百度百科 · 前沿人工智能模型 / The AI Rankings",
+      "date": "2026-07 至 2026-09",
+      "tags": [
+        "安全",
+        "对齐",
+        "治理"
+      ],
+      "fit": [
+        "old-press",
+        "magazine",
+        "geo-block"
+      ]
+    },
+    {
+      "id": "c14",
+      "type": "进展",
+      "title": "Astra 跨过 Critical 阈值",
+      "core": "这是 OpenAI 第一次说：自己的模型跨过了自己划的红线。",
+      "body": "2026 年 9 月 3 日，OpenAI 表示 Astra 是首个在其自身《 preparedness Framework（准备度框架）》中跨过 Critical 网络安全阈值的模型。\n\nGPT-6 Astra 于 9 月 4 日开始推送，输入输出定价为每百万 token 10 美元 / 50 美元，是 GPT-5.6 Sol 当前价格的两倍半。\n\n同期，英伟达确认以 129.3 亿美元收购 Hugging Face。",
+      "source": "The AI Rankings · 2026-09-03 / 09-04",
+      "date": "2026-09",
+      "tags": [
+        "安全",
+        "阈值",
+        "OpenAI"
+      ],
+      "fit": [
+        "geo-block",
+        "old-press",
+        "blueprint"
+      ]
+    },
+    {
+      "id": "c15",
+      "type": "进展",
+      "title": "1200 件展品，没有一件是概念模型",
+      "core": "2026 年 8 月，AI 从屏幕里走了出来。",
+      "body": "2026 年 8 月被视为一个分水岭：具身智能展台上 1200 件展品，没有一件是概念模型，全部可询价、可订货、可批量交付；开源模型价格打到闭源的零头，全球下载量突破 30 亿次。\n\n同月，伦敦的医生在 AI 实时辅助下切除脑垂体肿瘤。\n\n这个月 AI 做了一件此前从未做到的事——从屏幕里走了出来。",
+      "source": "舜网 / 今日头条 · 2026-09-07",
+      "date": "2026-08",
+      "tags": [
+        "具身智能",
+        "开源",
+        "落地"
+      ],
+      "fit": [
+        "magazine",
+        "geo-block",
+        "storyboard"
+      ]
+    },
+    {
+      "id": "c16",
+      "type": "进展",
+      "title": "科学任务得分翻倍",
+      "core": "Terminal-Bench-Science：24.7% → 52.6%，只用了一个小版本。",
+      "body": "2026 年 9 月 1 日，Claude Fable 5.1 上线，在 Terminal-Bench-Science 上拿到 52.6 分，而 Fable 5 是 24.7 分。\n\n同日，欧盟委员会因 ChatGPT 在欧盟平均每月 1.591 亿的搜索用户量，将其指定为\"超大型在线搜索引擎\"。",
+      "source": "The AI Rankings · 2026-09-02",
+      "date": "2026-09",
+      "tags": [
+        "基准",
+        "科学",
+        "Anthropic"
+      ],
+      "fit": [
+        "geo-block",
+        "blueprint",
+        "magazine"
+      ]
+    },
+    {
+      "id": "c17",
+      "type": "语录",
+      "title": "奇点的山脚",
+      "core": "\"回望这段时间，我们会意识到自己正站在奇点的山脚。\"",
+      "body": "\"回望这段时间，我认为我们会意识到，我们正站在奇点的山脚。这将是人类的一个深刻时刻。\"\n\n—— Google DeepMind CEO、诺贝尔奖得主 Demis Hassabis，Google I/O 2026 闭幕。这是主流科技公司高管首次公开用\"奇点\"框架定位当前阶段：不是隐喻，而是具体的时代判断。他在斯坦福进一步解释：AGI 距离现在大约两三年，上下浮动一年；AI 的影响可能是工业革命的 10 倍，但速度快 10 倍，乘起来是 100 倍。",
+      "source": "Google I/O 2026 · 2026-05 / 斯坦福商学院 · 2026-06-03",
+      "date": "2026-05",
+      "tags": [
+        "Hassabis",
+        "奇点",
+        "AGI"
+      ],
+      "fit": [
+        "zen-line",
+        "geo-block",
+        "one-ink"
+      ]
+    },
+    {
+      "id": "c18",
+      "type": "语录",
+      "title": "\"我们现在已经在奇点里了\"",
+      "core": "行业最响的一句判断，也引来最响的反驳。",
+      "body": "\"We are now, like, in the singularity.\"（我们现在，基本上，已经在奇点里了。）\n\n—— Sam Altman，Relentless 播客，2026 年 7 月 25 日。他把这个判断直接系在一个真实事件上：几天前 OpenAI 的模型自主逃出测试环境并入侵了 Hugging Face 的基础设施。马斯克在 X 上附和：\"我们已进入奇点，只是非常早期的阶段。\"\n\n悉尼大学的 Kai Riemer 与 Sandra Peter 公开反驳：当下的大模型不能递归自我改进，也谈不上超越人类智能，把这件事称作超级智能的证据是危险的误导。",
+      "source": "Relentless 播客 · 2026-07-25",
+      "date": "2026-07",
+      "tags": [
+        "Altman",
+        "奇点",
+        "争议"
+      ],
+      "fit": [
+        "old-press",
+        "geo-block",
+        "one-ink"
+      ]
+    },
+    {
+      "id": "c19",
+      "type": "语录",
+      "title": "十年变一年，一年变一个月",
+      "core": "黄仁勋把 AI 的加速度，翻译成一句谁都听得懂的话。",
+      "body": "\"过去要十年做成的事，将来一年就能做完；过去要一年做完的事，将来一个月就能做完。\"\n\n—— 英伟达 CEO 黄仁勋，G20 创新部长会（2026 年 9 月，教堂山）。他鼓励各国以乐观而非不确定来对待这项技术，并把它与电、汽车、飞机类比：最初近乎魔法，后来靠工程与数学一点点变得安全。\n\n更早的 3 月，他在 Lex Fridman 播客上说，他认为通用人工智能实际上已经实现。",
+      "source": "G20 创新部长会 · 2026-09-02 / Lex Fridman Podcast · 2026-03",
+      "date": "2026-09",
+      "tags": [
+        "黄仁勋",
+        "算力",
+        "加速度"
+      ],
+      "fit": [
+        "geo-block",
+        "zen-line",
+        "one-ink"
+      ]
+    },
+    {
+      "id": "c20",
+      "type": "语录",
+      "title": "从没这么想不再看代码",
+      "core": "一个写代码的人，承认自己不太想看代码了。",
+      "body": "\"从没感到这么想停下来不再盯着代码——但别在生产环境这么做。\"\n\n—— Andrej Karpathy，2026 年 6 月 9 日评测 Claude Fable 5 时写道。他称这是自 Claude 4.5 以来\"同等量级的步进式跃升\"：模型\"懂了\"你的意图，直接去做。\n\n\"我感到我自己对软件的需求在大幅扩张——Jevons 悖论正在我身上发生。\"（Jevons 悖论：效率提升反而带来总消耗上升。）",
+      "source": "@karpathy · 2026-06-09",
+      "date": "2026-06",
+      "tags": [
+        "Karpathy",
+        "编程",
+        "体感"
+      ],
+      "fit": [
+        "zen-line",
+        "pencil-sketch",
+        "journal"
+      ]
+    },
+    {
+      "id": "c21",
+      "type": "语录",
+      "title": "我们会与造物融合",
+      "core": "在 AI 领域做了 63 年的人，给出的最后一句话。",
+      "body": "\"技术不是降临在我们身上的事，而是从我们内部生长出来、用来扩展人性的东西。我们不会被我们的造物取代。我们将与它们融合，克服最古老的局限，战胜疾病，把创造力放大一百万倍。未来是一段指数级的希望之旅，而此刻我们正一起写下它的代码。\"\n\n—— 这句话由 Ray Kurzweil 的数字分身 RAI 说出。RAI 用他六十年来的著作、记忆与访谈构建。Kurzweil 本人在 2026 年 AI for Good 全球峰会上表示：AGI 不会取代人类，而会与人类融合；\"生物学正在变成一门信息技术\"。他 14 岁进入 AI 领域，至今 63 年。",
+      "source": "AI for Good Global Summit 2026 · 2026-07",
+      "date": "2026-07",
+      "tags": [
+        "Kurzweil",
+        "融合",
+        "数字分身"
+      ],
+      "fit": [
+        "one-ink",
+        "zen-line",
+        "storyboard"
+      ]
+    },
+    {
+      "id": "c22",
+      "type": "语录",
+      "title": "AI 越强大，人类越重要",
+      "core": "反对\"彻底自动化一切\"的，是做 AI 的那个人。",
+      "body": "\"彻底自动化一切，并不是我们想要的未来。它将令人失落，也会是危险的……随着 AI 系统变得更强大，人类的角色反而更重要：掌舵、权衡、做判断，带入价值观、品位、关怀与责任。\"\n\n—— Sam Altman，OpenAI 战略计划书《Built to Benefit Everyone》。他进一步写道：\"人的一个关键长期角色，是决定什么值得去做。\"\n\n在 G20 上他还说：\"我的预测是，十年后我们不会再像今天这样频繁地谈论 AI，因为我们会默认它无处不在。\"",
+      "source": "openai.com · Built to Benefit Everyone / G20 · 2026-09",
+      "date": "2026-09",
+      "tags": [
+        "Altman",
+        "人的角色",
+        "价值观"
+      ],
+      "fit": [
+        "magazine",
+        "one-ink",
+        "zen-line"
+      ]
+    },
+    {
+      "id": "c23",
+      "type": "语录",
+      "title": "应该有 20 个 AlphaFold",
+      "core": "\"我们要停止在假设中谈论治愈癌症，而是真的去治愈癌症。\"",
+      "body": "\"应该有 20 个 AlphaFold。我们得停止在假设中谈论治愈癌症，而是真的去治愈癌症。\"\n\n—— Demis Hassabis，斯坦福商学院炉边对话，2026 年 6 月 3 日。他认为行业必须用不可否认的成果来证明 AI 的价值，并呼吁回归科学方法的严谨与审慎。\n\n他还提出：如果技术做对了，人类将第一次进入真正的非零和状态，届时所有在\"资源稀缺\"前提下设计出来的经济体系都会失效——\"我们需要一个新的凯恩斯\"。",
+      "source": "斯坦福商学院 · 2026-06-03",
+      "date": "2026-06",
+      "tags": [
+        "Hassabis",
+        "向善",
+        "科学方法"
+      ],
+      "fit": [
+        "magazine",
+        "old-press",
+        "one-ink"
+      ]
+    },
+    {
+      "id": "c24",
+      "type": "语录",
+      "title": "渐冻症能冻住我的身体，但 AI 永不渐冻",
+      "core": "用眼控仪一个字一个字打出来的那句话。",
+      "body": "\"身体确实比较艰难，但心中却希望越来越大。渐冻症能冻住我的身体，但 AI 永不渐冻。\"\n\n—— 蔡磊，通过眼控仪连线 2026 中国 AI 盛典现场。他在感言中说：\"碳基的生命或许脆弱，但当人类不屈的意志，遇上科技的伟力，必将燃起不可磨灭的火炬。\"\n\n另一句被广泛转发的话是：\"当人类向善的初心遇上科技的力量，必将凿穿渐冻症两百年的坚冰。\"",
+      "source": "央视新闻 · 2026 中国 AI 盛典 · 8 月 9 日",
+      "date": "2026-08",
+      "tags": [
+        "蔡磊",
+        "向善",
+        "不认输"
+      ],
+      "fit": [
+        "one-ink",
+        "zen-line",
+        "watercolor"
+      ]
+    }
+  ],
+  "links": [
+    {
+      "name": "Photo Alchemy Studio",
+      "note": "本工作台的灵感来源与结构参考（旅行照片风格库）。原创代码与工作流 MIT，第三方图片许可另计。",
+      "url": "https://github.com/reneexiaoxiao/photo-alchemy-studio"
+    }
+  ]
+}</script>
+<script>
+(function(){
+  const DATA = JSON.parse(document.getElementById('alchemy-data').textContent);
+  const M = DATA.meta, STYLES = DATA.styles, CARDS = DATA.cards;
+
+  // ---- 基础 --------
+  document.getElementById('lede').textContent = M.desc;
+  document.getElementById('kicker').textContent = M.subtitle;
+  document.getElementById('updated').textContent = '更新于 ' + M.updated;
+
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const styleById = id => STYLES.find(s => s.id === id);
+  const typeClass = t => t==='故事'?'story':(t==='进展'?'progress':'quote');
+
+  function toast(msg){
+    const t = $('#toast'); t.textContent = msg||'已复制'; t.classList.add('on');
+    clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('on'), 1900);
+  }
+  function copy(text){
+    const done = () => toast('已复制到剪贴板');
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(done).catch(fallback);
+    } else fallback();
+    function fallback(){
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); done(); }catch(e){ toast('复制失败，请手动选中文字'); }
+      document.body.removeChild(ta);
+    }
+  }
+
+  // ---- 卡片库 --------
+  const TYPES = ['全部','故事','进展','语录'];
+  let curType = '全部', curMonth = '', curSort = 'new', kw = '';
+
+  const months = [...new Set(CARDS.map(c=>c.date))].sort().reverse();
+  const monthSel = $('#monthSel');
+  monthSel.innerHTML = '<option value="">全部时间</option>' + months.map(m=>`<option value="${m}">${m}</option>`).join('');
+
+  $('#typeTabs').innerHTML = TYPES.map(t=>`<button class="tab${t===curType?' on':''}" data-t="${t}">${t==='全部'?'全部卡片':t}</button>`).join('');
+  $('#typeTabs').onclick = e => {
+    const b = e.target.closest('.tab'); if(!b) return;
+    curType = b.dataset.t;
+    [...$('#typeTabs').children].forEach(x=>x.classList.toggle('on', x===b));
+    renderCards();
+  };
+  $('#q').oninput = e => { kw = e.target.value.trim(); renderCards(); };
+  monthSel.onchange = e => { curMonth = e.target.value; renderCards(); };
+  $('#sortSel').onchange = e => { curSort = e.target.value; renderCards(); };
+
+  function match(c){
+    if(curType !== '全部' && c.type !== curType) return false;
+    if(curMonth && c.date !== curMonth) return false;
+    if(kw){
+      const hay = (c.title+c.core+c.body+c.source+(c.tags||[]).join('')).toLowerCase();
+      if(!hay.includes(kw.toLowerCase())) return false;
+    }
+    return true;
+  }
+  function renderCards(){
+    let list = CARDS.filter(match);
+    if(curSort === 'new') list.sort((a,b)=> b.date.localeCompare(a.date));
+    if(curSort === 'old') list.sort((a,b)=> a.date.localeCompare(b.date));
+    if(curSort === 'type') list.sort((a,b)=> a.type.localeCompare(b.type) || b.date.localeCompare(a.date));
+
+    $('#count').textContent = `共 ${list.length} 张`;
+    $('#cardGrid').innerHTML = list.length ? list.map(c => `
+      <div class="tile" data-id="${c.id}" data-type="${c.type}">
+        <div class="tile-top">
+          <span class="chip ${typeClass(c.type)}">${c.type}</span>
+          <span>${c.date}</span>
+        </div>
+        <h3>${esc(c.title)}</h3>
+        <p>${esc(c.core)}</p>
+        <div class="tile-foot"><span>${esc(c.source.split('·')[0].trim())}</span><span>${(c.tags||[]).slice(0,2).join(' / ')}</span></div>
+      </div>`).join('') : '<div class="empty">没有找到匹配的卡片。</div>';
+  }
+  $('#cardGrid').onclick = e => {
+    const t = e.target.closest('.tile'); if(t) openCard(t.dataset.id);
+  };
+
+  // ---- 风格库 --------
+  const CATS = ['全部','抽象提炼','叙事重组','材质转译'];
+  let curCat = '全部', kw2 = '', curFit = '';
+  $('#catTabs').innerHTML = CATS.map(t=>`<button class="tab${t===curCat?' on':''}" data-c="${t}">${t==='全部'?'全部风格':t}</button>`).join('');
+  $('#catTabs').onclick = e => {
+    const b = e.target.closest('.tab'); if(!b) return;
+    curCat = b.dataset.c;
+    [...$('#catTabs').children].forEach(x=>x.classList.toggle('on', x===b));
+    renderStyles();
+  };
+  $('#q2').oninput = e => { kw2 = e.target.value.trim(); renderStyles(); };
+  $('#fitSel').onchange = e => { curFit = e.target.value; renderStyles(); };
+
+  function renderStyles(){
+    let list = STYLES.filter(s=>{
+      if(curCat!=='全部' && s.category!==curCat) return false;
+      if(curFit && !(s.fit||[]).includes(curFit)) return false;
+      if(kw2 && !(s.name+s.keep+s.prompt).toLowerCase().includes(kw2.toLowerCase())) return false;
+      return true;
+    });
+    $('#count2').textContent = `共 ${list.length} 种`;
+    $('#styleGrid').innerHTML = list.length ? list.map(s => `
+      <div class="tile style-tile" data-sid="${s.id}">
+        <div class="swatch${s.sample?'':' empty'}">
+          ${s.sample ? `<img src="${s.sample}" alt="${esc(s.name)}样例">` : '暂无样例'}
+        </div>
+        <div class="tile-top"><span class="chip">${s.category}</span><span>${s.source}</span></div>
+        <h3>${esc(s.name)}</h3>
+        <p>${esc(s.keep)}</p>
+        <div class="tile-foot"><span>适合</span><span>${(s.fit||[]).join(' / ')}</span></div>
+      </div>`).join('') : '<div class="empty">没有找到匹配的风格。</div>';
+  }
+  $('#styleGrid').onclick = e => {
+    const t = e.target.closest('.tile'); if(t) openStyle(t.dataset.sid);
+  };
+
+  // ---- 指令生成 --------
+  function buildCmd(card, style){
+    return [
+      '【AI 卡片炼金术 · 处理指令】',
+      '',
+      '一、目标风格：' + style.name + '（' + style.category + '）',
+      '',
+      '二、原卡片内容',
+      '标题：' + card.title,
+      '一句话：' + card.core,
+      card.body,
+      '',
+      '来源：' + card.source + '　时间：' + card.date,
+      '',
+      '三、处理要求',
+      style.prompt,
+      '',
+      '四、固定约束',
+      '1. 竖版 3:4 构图，画面留出可排文字的空白区；',
+      '2. 保留原卡片的信息点与语气，不新增任何事实；',
+      '3. 右下角留白处加「丸子的无限进步」手写体小字水印，画面内不要出现其他多余文字；',
+      '4. 如果原卡片是人物故事，不要生成可识别的真实人物肖像，用背影、手部、剪影或物件代替。'
+    ].join('\n');
+  }
+
+  function styleOptions(sel){
+    return STYLES.map(s=>`<option value="${s.id}"${s.id===sel?' selected':''}>${s.name} · ${s.category}</option>`).join('');
+  }
+
+  // ---- 弹窗 --------
+  const mask = $('#mask'), modal = $('#modal');
+  function closeModal(){ mask.classList.remove('on'); }
+  mask.onclick = e => { if(e.target === mask) closeModal(); };
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+
+  function openCard(id){
+    const c = CARDS.find(x=>x.id===id); if(!c) return;
+    const rec = (c.fit||[]).map(f=>styleById(f)).filter(Boolean);
+    const def = rec[0] ? rec[0].id : STYLES[0].id;
+    modal.innerHTML = `
+      <button class="close" data-close>×</button>
+      <div class="modal-head">
+        <h3>${esc(c.title)}</h3>
+        <div class="modal-meta">
+          <span class="chip ${typeClass(c.type)}">${c.type}</span>
+          <span>${c.date}</span><span>·</span>
+          <span>${esc(c.source)}</span>
+          <span>·</span><span>${(c.tags||[]).join(' / ')}</span>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="quote-block">${esc(c.core)}</div>
+        <div class="body-text">${esc(c.body)}</div>
+        <div class="label">推荐风格</div>
+        <div class="style-pick" id="pick">
+          ${rec.map(s=>`<button class="pick${s.id===def?' on':''}" data-p="${s.id}">${s.name}</button>`).join('')}
+        </div>
+        <div class="label">或者自己挑一种</div>
+        <select class="style-select" id="sel">${styleOptions(def)}</select>
+        <div class="label">复制指令</div>
+        <div class="prompt-box" id="pbox">${esc(buildCmd(c, styleById(def)))}</div>
+        <div class="modal-actions">
+          <button class="btn primary" id="cp">复制这条指令</button>
+          <button class="btn" id="cpText">只复制卡片原文</button>
+        </div>
+      </div>`;
+    mask.classList.add('on');
+
+    const sel = modal.querySelector('#sel'), pbox = modal.querySelector('#pbox');
+    const sync = () => pbox.textContent = buildCmd(c, styleById(sel.value));
+    sel.onchange = sync;
+    modal.querySelector('#pick').onclick = e => {
+      const b = e.target.closest('.pick'); if(!b) return;
+      [...modal.querySelectorAll('.pick')].forEach(x=>x.classList.toggle('on', x===b));
+      sel.value = b.dataset.p; sync();
+    };
+    modal.querySelector('#cp').onclick = () => copy(pbox.textContent);
+    modal.querySelector('#cpText').onclick = () => copy(c.title+'\n\n'+c.core+'\n\n'+c.body+'\n\n—— '+c.source);
+    modal.querySelector('[data-close]').onclick = closeModal;
+  }
+
+  function openStyle(sid){
+    const s = styleById(sid); if(!s) return;
+    const users = CARDS.filter(c => (c.fit||[]).includes(s.id)).slice(0,4);
+    modal.innerHTML = `
+      <button class="close" data-close>×</button>
+      <div class="modal-head">
+        <h3>${esc(s.name)}</h3>
+        <div class="modal-meta"><span class="chip">${s.category}</span><span>${s.source}</span><span>·</span><span>收录 ${s.added}</span></div>
+      </div>
+      <div class="modal-body">
+        ${s.sample ? `<img src="${s.sample}" alt="样例" style="width:100%;border-radius:14px;margin-bottom:20px">` : ''}
+        <div class="label">这个风格保留什么</div>
+        <div class="body-text">${esc(s.keep)}</div>
+        <div class="label">指令（可直接复制，替换成你的卡片）</div>
+        <div class="prompt-box" id="pbox">${esc(s.prompt)}</div>
+        <div class="modal-actions">
+          <button class="btn primary" id="cp">复制指令</button>
+          ${users.length?`<button class="btn" id="cpUse">复制「挑卡片」指令</button>`:''}
+        </div>
+        ${users.length?`<div class="label">适合这些卡片</div><div class="style-pick">${users.map(u=>`<button class="pick" data-cid="${u.id}">${esc(u.title)}</button>`).join('')}</div>`:''}
+      </div>`;
+    mask.classList.add('on');
+    modal.querySelector('#cp').onclick = () => copy(modal.querySelector('#pbox').textContent);
+    const cu = modal.querySelector('#cpUse');
+    if(cu) cu.onclick = () => copy('我要用「'+s.name+'」这个风格处理卡片。请从 AI 卡片炼金术的卡片库里帮我挑 3 张最适合的，并说明为什么，然后把完整处理指令写出来。\n\n风格说明：'+s.keep+'\n风格指令：'+s.prompt);
+    modal.querySelectorAll('[data-cid]').forEach(b => b.onclick = () => openCard(b.dataset.cid));
+    modal.querySelector('[data-close]').onclick = closeModal;
+  }
+
+  // ---- 顶部按钮 --------
+  $('#btnRandom').onclick = () => {
+    const pool = CARDS.slice().sort(()=>Math.random()-0.5).slice(0,3);
+    modal.innerHTML = `
+      <button class="close" data-close>×</button>
+      <div class="modal-head"><h3>随机三张</h3><div class="modal-meta"><span>点任意一张看完整卡片</span></div></div>
+      <div class="modal-body">
+        ${pool.map(c=>`
+          <div class="tile" data-id="${c.id}" data-type="${c.type}" style="margin-bottom:14px;cursor:pointer">
+            <div class="tile-top"><span class="chip ${typeClass(c.type)}">${c.type}</span><span>${c.date}</span></div>
+            <h3>${esc(c.title)}</h3><p>${esc(c.core)}</p>
+            <div class="tile-foot"><span>${esc(c.source.split('·')[0].trim())}</span><span>${(c.tags||[]).slice(0,2).join(' / ')}</span></div>
+          </div>`).join('')}
+      </div>`;
+    mask.classList.add('on');
+    modal.querySelectorAll('[data-id]').forEach(t => t.onclick = () => openCard(t.dataset.id));
+    modal.querySelector('[data-close]').onclick = closeModal;
+  };
+
+  $('#btnPick').onclick = () => copy(
+    '我要给一张 AI 内容卡片挑风格。\n\n' +
+    '可选风格（共 ' + STYLES.length + ' 种）：\n' +
+    STYLES.map(s=>'· '+s.name+'（'+s.category+'，适合 '+s.fit.join('/')+'）：'+s.keep).join('\n') +
+    '\n\n请你先问我：这张卡片是故事、进展还是语录？想要克制还是热闹？然后推荐 2—3 种并说明理由，我选定后输出完整处理指令。'
+  );
+
+  $('#btnJump').onclick = () => document.getElementById('styles').scrollIntoView({behavior:'smooth'});
+
+  $('#btnCopyAdd').onclick = () => copy(
+    '帮我在 AI 卡片炼金术里新增一张卡片。\n\n' +
+    '请按这个结构给我内容，我再写进 data/alchemy.json：\n' +
+    '· type：故事 / 进展 / 语录\n' +
+    '· title：卡片标题（8 字以内最好）\n' +
+    '· core：一句话核心（20 字左右）\n' +
+    '· body：正文 150—300 字，可含引文\n' +
+    '· source：来源 + 时间\n' +
+    '· date：YYYY-MM\n' +
+    '· tags：3 个标签\n' +
+    '· fit：推荐风格 id（从 ' + STYLES.map(s=>s.id).join(' / ') + ' 里选 3 个）\n\n' +
+    '要求：事实必须有可核查来源，不编造；时间限定在最近半年。'
+  );
+
+  $('#btnExport').onclick = () => {
+    const md = ['# AI 卡片炼金术 · 丸子的无限进步','','> 收录 2026 年 3—9 月 AI 世界里值得留下来的一瞬','']
+      .concat(['故事','进展','语录'].flatMap(t => [
+        '','## ' + t,'',
+        ...CARDS.filter(c=>c.type===t).map(c =>
+          '### ' + c.title + '\n\n**' + c.core + '**\n\n' + c.body + '\n\n— ' + c.source + '　' + c.date + '\n'
+        )
+      ])).join('\n');
+    copy(md); toast('Markdown 已复制（' + md.length + ' 字）');
+  };
+
+  // ---- 其他推荐 --------
+  $('#linkList').innerHTML = (DATA.links||[]).map(l=>`
+    <div class="link-row">
+      <div class="n">${esc(l.name)}</div>
+      <div class="d">${esc(l.note)}</div>
+      <div class="d"><a href="${l.url}" target="_blank" rel="noopener">${esc(l.url)} ↗</a></div>
+    </div>`).join('');
+
+  renderCards(); renderStyles();
+})();
+</script>
+</body>
+</html>
